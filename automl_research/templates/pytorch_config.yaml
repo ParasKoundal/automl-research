@@ -1,0 +1,63 @@
+# automl-research: PyTorch Config-Driven Template
+# For projects with separate config files and training scripts.
+# Agent modifies config YAML + model code, reads training script for context.
+
+project:
+  name: "PyTorch Project"
+  description: ""
+  framework: pytorch
+
+train:
+  command_quick: "python train.py --config configs/config.yaml --quick"
+  command_full: "python train.py --config configs/config.yaml"
+  cwd: "."
+  time_budget_quick: "10m"
+  time_budget_full: "2h"
+
+metrics:
+  primary:
+    name: "val_loss"
+    direction: minimize
+    min_improvement: 0.001
+    extract:
+      method: log_grep
+      pattern: "val_loss\\s*[:=]\\s*([0-9.]+)"
+  secondary:
+    - name: "val_accuracy"
+      extract:
+        method: log_grep
+        pattern: "val_accuracy\\s*[:=]\\s*([0-9.]+)"
+  constraints:
+    - name: "peak_vram_mb"
+      max_value: 80000
+
+modifiable:
+  files:
+    - "configs/config.yaml"
+    - "models/model.py"
+  read_only:
+    - "train.py"
+    - "data/dataset.py"
+  forbidden:
+    - ".automl-research/**"
+    - "data/raw/**"
+
+environment:
+  allow_new_dependencies: false
+
+preflight:
+  max_diff_lines: 50
+  validate_syntax: true
+  validate_configs: true
+
+tracking:
+  wandb:
+    enabled: false
+
+# research:
+#   enabled: false
+#   keywords: []
+#   arxiv_categories: ["cs.LG"]
+#   openreview_venues: ["ICLR.cc", "NeurIPS.cc", "ICML.cc"]
+#   include_code: true
+#   auto_after_decide: false

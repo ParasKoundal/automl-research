@@ -1,0 +1,68 @@
+# automl-research: Multi-Stage Pipeline Template
+# For projects with pretrain → finetune or multi-step training.
+# Uses full training for the complete pipeline, quick for a fast subset.
+
+project:
+  name: "Multi-Stage Project"
+  description: ""
+  framework: pytorch
+
+train:
+  command_quick: "bash scripts/train_quick.sh"
+  command_full: "bash scripts/train_full.sh"
+  cwd: "."
+  time_budget_quick: "15m"
+  time_budget_full: "4h"
+
+metrics:
+  primary:
+    name: "val_loss"
+    direction: minimize
+    min_improvement: 0.001
+    extract:
+      method: log_grep
+      pattern: "val_loss\\s*[:=]\\s*([0-9.]+)"
+  secondary:
+    - name: "pretrain_loss"
+      extract:
+        method: log_grep
+        pattern: "pretrain_loss\\s*[:=]\\s*([0-9.]+)"
+    - name: "finetune_loss"
+      extract:
+        method: log_grep
+        pattern: "finetune_loss\\s*[:=]\\s*([0-9.]+)"
+  constraints: []
+
+modifiable:
+  files:
+    - "configs/pretrain.yaml"
+    - "configs/finetune.yaml"
+    - "models/backbone.py"
+    - "models/head.py"
+  read_only:
+    - "scripts/train_quick.sh"
+    - "scripts/train_full.sh"
+    - "data/dataloader.py"
+  forbidden:
+    - ".automl-research/**"
+    - "checkpoints/**"
+
+environment:
+  allow_new_dependencies: false
+
+preflight:
+  max_diff_lines: 75
+  validate_syntax: true
+  validate_configs: true
+
+tracking:
+  wandb:
+    enabled: false
+
+# research:
+#   enabled: false
+#   keywords: []
+#   arxiv_categories: ["cs.LG"]
+#   openreview_venues: ["ICLR.cc", "NeurIPS.cc", "ICML.cc"]
+#   include_code: true
+#   auto_after_decide: false

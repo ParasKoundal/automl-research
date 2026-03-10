@@ -1,0 +1,51 @@
+# automl-research: Simple Script Template
+# For projects with a single training script and log-based metrics.
+# Equivalent to Karpathy's autoresearch setup.
+
+project:
+  name: "My ML Project"
+  description: ""
+  framework: pytorch
+
+train:
+  command_quick: "python train.py"
+  cwd: "."
+  time_budget_quick: "5m"
+
+metrics:
+  primary:
+    name: "val_loss"
+    direction: minimize
+    min_improvement: 0.001
+    extract:
+      method: log_grep
+      pattern: "val_loss\\s*[:=]\\s*([0-9.]+)"
+  secondary: []
+  constraints: []
+
+modifiable:
+  files:
+    - "train.py"
+  read_only: []
+  forbidden:
+    - ".automl-research/**"
+
+environment:
+  allow_new_dependencies: false
+
+preflight:
+  max_diff_lines: 50
+  validate_syntax: true
+  validate_configs: true
+
+tracking:
+  wandb:
+    enabled: false
+
+# research:
+#   enabled: false
+#   keywords: []
+#   arxiv_categories: []
+#   openreview_venues: ["ICLR.cc", "NeurIPS.cc", "ICML.cc"]
+#   include_code: true
+#   auto_after_decide: false
