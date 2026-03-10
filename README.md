@@ -19,7 +19,7 @@ pip install "automl-research[wandb]"
 
 > **Currently on TestPyPI** — while we're in early release:
 > ```bash
-> pip install -i https://test.pypi.org/simple/ automl-research==0.1.0
+> pip install -i https://test.pypi.org/simple/ automl-research
 > ```
 
 From source:
