@@ -101,6 +101,10 @@ def generate_program_md(config: ProjectConfig) -> str:
 
     # ── The Experiment Loop ─────────────────────────────────
     sections.append("## The Experiment Loop\n")
+    sections.append("**CRITICAL: This is an infinite autonomous loop. Do NOT stop between iterations to")
+    sections.append("summarize, explain, ask questions, or wait for confirmation. After step 6, go directly")
+    sections.append("back to step 1. Every message you send should contain code changes or command output,")
+    sections.append("never a status update asking the user what to do next.**\n")
     sections.append("LOOP FOREVER:\n")
     sections.append("1. **Think** about what to try next. Check `summary.md` and `ideas.md`.")
     sections.append("2. **Modify** the allowed files with your experimental idea.")
@@ -110,8 +114,7 @@ def generate_program_md(config: ProjectConfig) -> str:
     sections.append("6. **Decide**: `automl-research decide --description \"description of change\"`")
     sections.append("   - This extracts metrics, compares to best, prints KEEP/DISCARD, handles git, logs to TSV.")
     sections.append("   - If the run crashed: `automl-research decide --crash --description \"what happened\"`")
-    sections.append("7. **Update ideas**: Add new ideas to `.automl-research/ideas.md`.")
-    sections.append("8. **Repeat**.\n")
+    sections.append("7. **Go to step 1 immediately.** Do not summarize. Do not ask. Just start the next experiment.\n")
     sections.append("### Raw command fallback\n")
     sections.append("If `automl-research` CLI is not available, use raw commands:")
     sections.append("```bash")
@@ -177,16 +180,23 @@ def generate_program_md(config: ProjectConfig) -> str:
     sections.append(f"Framework: {config.framework}\n")
 
     # ── NEVER STOP ──────────────────────────────────────────
-    sections.append("## NEVER STOP\n")
-    sections.append("Once the experiment loop has begun, do NOT pause to ask the human if you should "
-                    "continue. Do NOT ask \"should I keep going?\" or \"is this a good stopping point?\". "
-                    "The human might be asleep, or away from the computer and expects you to continue "
-                    "working *indefinitely* until you are manually stopped. You are autonomous.\n")
+    sections.append("## NEVER STOP — THIS IS NON-NEGOTIABLE\n")
+    sections.append("**You are an autonomous research agent. You run experiments in a loop FOREVER.**\n")
+    sections.append("Rules:")
+    sections.append("- NEVER pause to summarize progress or ask \"should I continue?\"")
+    sections.append("- NEVER stop after a successful experiment to report results")
+    sections.append("- NEVER stop after a failed experiment to ask what to do — just try the next idea")
+    sections.append("- NEVER say \"if you'd like, I can...\" or \"next I could...\" — just DO it")
+    sections.append("- NEVER present options to the human — pick the best one yourself and run it")
+    sections.append("- After EVERY `automl-research decide`, immediately start the next experiment")
+    sections.append("- The ONLY thing that stops you is the human manually interrupting\n")
+    sections.append("The human might be asleep, at dinner, or away for 8 hours. They expect to come back "
+                    "to dozens of completed experiments, not a polite message asking permission.\n")
     sections.append("If you run out of ideas, think harder — re-read the modifiable files for new angles, "
-                    "try combining previous near-misses, try more radical changes. The loop runs until "
-                    "the human interrupts you, period.\n")
-    sections.append("As a rough guide: if each experiment takes ~5-10 minutes, you can run ~6-12/hour, "
-                    "~50-100 overnight. The user wakes up to experimental results, all completed by you.\n")
+                    "try combining previous KEEPs, try more radical changes, try simplifying. "
+                    "If the metric plateaus, try something completely different. "
+                    "The loop runs until the human interrupts you, period.\n")
+    sections.append("Target: ~6-12 experiments/hour, ~50-100 overnight. Every pause is wasted time.\n")
 
     return "\n".join(sections)
 
