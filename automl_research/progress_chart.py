@@ -81,23 +81,17 @@ def generate_progress_chart(
     fig, ax = plt.subplots(figsize=(16, 8))
 
     baseline_val = valid_metrics[0]
-
-    # Only show the interesting region (at or near baseline)
     is_minimize = direction == "minimize"
-    if is_minimize:
-        plot_mask = [m <= baseline_val * 1.005 for m in valid_metrics]
-    else:
-        plot_mask = [m >= baseline_val * 0.995 for m in valid_metrics]
 
-    # Plot discarded as faint gray dots
-    disc_ids = [valid_ids[i] for i in range(len(valid_ids)) if valid_statuses[i] == "discard" and plot_mask[i]]
-    disc_vals = [valid_metrics[i] for i in range(len(valid_ids)) if valid_statuses[i] == "discard" and plot_mask[i]]
+    # Plot ALL discarded as gray dots (no filtering)
+    disc_ids = [valid_ids[i] for i in range(len(valid_ids)) if valid_statuses[i] == "discard"]
+    disc_vals = [valid_metrics[i] for i in range(len(valid_ids)) if valid_statuses[i] == "discard"]
     ax.scatter(disc_ids, disc_vals, c="#cccccc", s=12, alpha=0.5, zorder=2, label="Discarded")
 
-    # Plot kept as prominent green dots
-    kept_ids = [valid_ids[i] for i in range(len(valid_ids)) if valid_statuses[i] == "keep" and plot_mask[i]]
-    kept_vals = [valid_metrics[i] for i in range(len(valid_ids)) if valid_statuses[i] == "keep" and plot_mask[i]]
-    kept_descs = [valid_descs[i] for i in range(len(valid_ids)) if valid_statuses[i] == "keep" and plot_mask[i]]
+    # Plot ALL kept as prominent green dots
+    kept_ids = [valid_ids[i] for i in range(len(valid_ids)) if valid_statuses[i] == "keep"]
+    kept_vals = [valid_metrics[i] for i in range(len(valid_ids)) if valid_statuses[i] == "keep"]
+    kept_descs = [valid_descs[i] for i in range(len(valid_ids)) if valid_statuses[i] == "keep"]
     ax.scatter(kept_ids, kept_vals, c="#2ecc71", s=50, zorder=4, label="Kept",
                edgecolors="black", linewidths=0.5)
 
@@ -142,15 +136,14 @@ def generate_progress_chart(
     ax.legend(loc="upper right", fontsize=9)
     ax.grid(True, alpha=0.2)
 
-    # Y-axis zoom to interesting region
-    if all_kept_vals:
-        best_val = min(all_kept_vals) if is_minimize else max(all_kept_vals)
-        span = abs(baseline_val - best_val)
-        margin = span * 0.15 if span > 0 else abs(baseline_val) * 0.01
-        if is_minimize:
-            ax.set_ylim(best_val - margin, baseline_val + margin)
-        else:
-            ax.set_ylim(baseline_val - margin, best_val + margin)
+    # Y-axis: show all data points with margin
+    all_plotted_vals = disc_vals + kept_vals
+    if all_plotted_vals:
+        y_min = min(all_plotted_vals)
+        y_max = max(all_plotted_vals)
+        span = y_max - y_min
+        margin = span * 0.1 if span > 0 else abs(y_min) * 0.01
+        ax.set_ylim(y_min - margin, y_max + margin)
 
     plt.tight_layout()
     return fig

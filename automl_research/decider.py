@@ -337,6 +337,7 @@ def decide(
     is_crash: bool = False,
     wall_time: float = 0.0,
     session_tag: str = "",
+    notes: str = "",
 ) -> Decision:
     """Make the keep/discard decision for the latest experiment.
 
@@ -470,13 +471,17 @@ def decide(
     lines_changed = _git_diff_stat(config.project_root)
     diff_text = _git_diff_text(config.project_root)
 
-    # Save diff.patch to run dir (preserves code for ALL experiments, even discarded)
+    # Save diff.patch and notes to run dir (preserves code for ALL experiments, even discarded)
     try:
         runs_dir = ar_dir / "runs"
         if runs_dir.exists():
             run_dirs_all = sorted(runs_dir.iterdir(), key=lambda p: p.name)
-            if run_dirs_all and diff_text:
-                (run_dirs_all[-1] / "diff.patch").write_text(diff_text)
+            if run_dirs_all:
+                run_dir = run_dirs_all[-1]
+                if diff_text:
+                    (run_dir / "diff.patch").write_text(diff_text)
+                if notes:
+                    (run_dir / "notes.md").write_text(notes + "\n")
     except Exception:
         pass
 

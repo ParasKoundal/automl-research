@@ -294,7 +294,8 @@ def train(full: bool, description: str):
 @click.option("--crash", is_flag=True, help="Log as a crashed experiment.")
 @click.option("--wall-time", type=float, default=0.0, help="Wall time in seconds (auto-detected if possible).")
 @click.option("--session", default="", help="Session tag for WandB grouping.")
-def decide_cmd(description: str, crash: bool, wall_time: float, session: str):
+@click.option("--notes", "-n", default="", help="Agent reasoning: why this experiment, what was expected, what was learned.")
+def decide_cmd(description: str, crash: bool, wall_time: float, session: str, notes: str):
     """Make keep/discard decision for the latest experiment."""
     config = load_config(find_config())
 
@@ -304,6 +305,7 @@ def decide_cmd(description: str, crash: bool, wall_time: float, session: str):
         is_crash=crash,
         wall_time=wall_time,
         session_tag=session,
+        notes=notes,
     )
 
     # Display result
