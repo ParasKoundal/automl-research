@@ -333,6 +333,9 @@ def decide_cmd(description: str, crash: bool, wall_time: float, session: str, no
     if result.research_ideas_added:
         click.echo(f"  Research: {result.research_ideas_added} new ideas added to ideas.md")
 
+    # Continuation nudge — the last thing the agent reads tells it to keep going
+    click.echo(f"\n→ NEXT: Start experiment #{result.experiment_id + 1:03d} immediately. Do not summarize or ask.")
+
 
 # ---------------------------------------------------------------------------
 # status
