@@ -35,8 +35,7 @@ def generate_program_md(config: ProjectConfig) -> str:
     sections.append("4. **Check resume state**: Read `.automl-research/state.json` for the current best metric and experiment count.")
     sections.append("5. **Check experiment history**: Read `.automl-research/summary.md` for what's been tried before.")
     sections.append("6. **Check ideas**: Read `.automl-research/ideas.md` for experiment ideas (add new ones as you discover them).")
-    sections.append("7. **Create a branch**: `git checkout -b automl-research/<tag>` (e.g., `automl-research/mar10`).")
-    sections.append("8. **Confirm and go**.\n")
+    sections.append("7. **Start experimenting** — the experiment branch was created during `automl-research init`.\n")
 
     # ── What you CAN/CANNOT do ──────────────────────────────
     sections.append("## What you CAN modify\n")

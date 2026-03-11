@@ -9,7 +9,7 @@ from typing import Optional
 
 def detect_framework(project_root: Path) -> Optional[str]:
     """Detect ML framework from import statements."""
-    counts: dict[str, int] = {"pytorch": 0, "tensorflow": 0, "jax": 0, "sklearn": 0}
+    counts: dict[str, int] = {"pytorch": 0, "tensorflow": 0, "keras": 0, "jax": 0, "sklearn": 0}
     for py in project_root.rglob("*.py"):
         try:
             text = py.read_text(errors="ignore")
@@ -19,6 +19,8 @@ def detect_framework(project_root: Path) -> Optional[str]:
             counts["pytorch"] += 1
         if "import tensorflow" in text or "from tensorflow" in text:
             counts["tensorflow"] += 1
+        if "import keras" in text or "from keras" in text:
+            counts["keras"] += 1
         if "import jax" in text or "from jax" in text:
             counts["jax"] += 1
         if "import sklearn" in text or "from sklearn" in text:

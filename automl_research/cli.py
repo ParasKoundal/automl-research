@@ -73,16 +73,16 @@ def init(template: str | None):
 
         # Training command
         default_script = scan["training_scripts"][0] if scan["training_scripts"] else "train.py"
-        train_cmd = click.prompt("Training command (quick mode)", default=f"python {default_script}")
+        train_cmd = click.prompt("Training command (quick mode)", default=f"{sys.executable} {default_script}")
         train_full = click.prompt("Full training command (optional, press Enter to skip)", default="")
         cwd = click.prompt("Working directory", default=".")
-        budget = click.prompt("Time budget for quick runs", default="10m")
+        budget = click.prompt("Time budget for quick runs (e.g. 5m, 15m, 30m, 1h)", default="5m")
 
         # Metric
         metric_name = click.prompt("Primary metric name", default="val_loss")
         direction = click.prompt("Direction", type=click.Choice(["minimize", "maximize"]), default="minimize")
-        pattern = click.prompt("Grep pattern to extract metric from log",
-                               default=f"{metric_name}\\s*[:=]\\s*([0-9.]+(?:[eE][+-]?\\d+)?)")
+        pattern = f"{metric_name}\\s*[:=]\\s*([0-9.]+(?:[eE][+-]?\\d+)?)"
+        click.echo(f"  Pattern: {pattern}")
 
         # Modifiable files
         default_files = scan["config_files"][:3] + scan["model_files"][:2]
@@ -111,6 +111,13 @@ def init(template: str | None):
             "environment": {"allow_new_dependencies": False},
             "preflight": {"max_diff_lines": 50, "validate_syntax": True, "validate_configs": True},
             "tracking": {"wandb": {"enabled": False}},
+            "research": {
+                "enabled": True,
+                "keywords": [],
+                "arxiv_categories": ["cs.LG"],
+                "sources": ["semantic_scholar", "arxiv"],
+                "include_code": True,
+            },
         }
         if train_full:
             config_dict["train"]["command_full"] = train_full
@@ -149,8 +156,25 @@ def init(template: str | None):
     write_ideas_md(ideas_path)
     click.echo(f"Created {ideas_path}")
 
-    # Create empty results.tsv and summary.md
+    # Create results.tsv with header and summary.md
+    tsv_header = "\t".join(["id", "commit", config.metrics.primary.name, "status", "wall_time", "lines_changed", "description"])
+    (ar_dir / "results.tsv").write_text(tsv_header + "\n")
+    click.echo(f"Created {ar_dir / 'results.tsv'}")
     (ar_dir / "summary.md").write_text("# Experiment Summary\n\nNo experiments yet.\n")
+
+    # Create experiment branch automatically
+    branch_name = f"automl-research/{config.name.lower().replace(' ', '-')}"
+    try:
+        result = subprocess.run(
+            ["git", "checkout", "-b", branch_name],
+            capture_output=True, text=True, cwd=str(project_root),
+        )
+        if result.returncode == 0:
+            click.echo(f"Created branch: {branch_name}")
+        else:
+            click.echo(f"  ⚠ Could not create branch: {result.stderr.strip()}")
+    except Exception:
+        click.echo(f"  ⚠ Could not create git branch (git not found or not a repo)")
 
     click.echo(f"\nReady! Open your AI tool and tell it:")
     click.echo(f'  "Read .automl-research/program.md and start experimenting"')

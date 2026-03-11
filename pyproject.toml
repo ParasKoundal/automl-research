@@ -1,6 +1,6 @@
 [project]
 name = "automl-research"
-version = "0.1.7"
+version = "0.1.8"
 description = "Generalized autonomous ML experimentation — Karpathy's autoresearch for any ML project"
 authors = [
     {name = "Paras Koundal", email = "paraskoundal@users.noreply.github.com"},
