@@ -98,6 +98,7 @@ class ResearchConfig:
     sources: list[str] = field(default_factory=lambda: ["semantic_scholar", "arxiv"])
     auto_after_decide: bool = False
     include_code: bool = True
+    time_budget: int = 120  # max seconds for entire research run
     semantic_scholar_api_key: Optional[str] = None  # or env S2_API_KEY
 
 
@@ -249,6 +250,7 @@ def load_config(config_path: str | Path) -> ProjectConfig:
         sources=res.get("sources", ["semantic_scholar", "arxiv"]),
         auto_after_decide=res.get("auto_after_decide", False),
         include_code=res.get("include_code", True),
+        time_budget=res.get("time_budget", 120),
         semantic_scholar_api_key=res.get("semantic_scholar_api_key") or os.environ.get("S2_API_KEY"),
     )
 

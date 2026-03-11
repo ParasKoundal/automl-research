@@ -1065,6 +1065,11 @@ def run_research(
     api_key = rc.semantic_scholar_api_key
     all_papers: list[Paper] = []
     all_ideas: list[ResearchIdea] = []
+    _research_start = time.monotonic()
+    _time_budget = rc.time_budget  # seconds (default 120)
+
+    def _over_budget() -> bool:
+        return (time.monotonic() - _research_start) >= _time_budget
 
     # Build queries
     if deep:
@@ -1086,6 +1091,8 @@ def run_research(
 
     _query_count = 0
     for query, reason in queries:
+        if _over_budget():
+            break
         # Rate-limit between queries (ArXiv recommends 3s between requests)
         if _query_count > 0:
             time.sleep(3)
@@ -1117,7 +1124,7 @@ def run_research(
             continue
 
         # Regular search across configured sources
-        if "semantic_scholar" in active_sources:
+        if "semantic_scholar" in active_sources and not _over_budget():
             try:
                 papers = search_semantic_scholar(query, max_results=max_per_source, api_key=api_key, cache=cache, framework=config.framework)
                 for p in papers:
@@ -1126,7 +1133,7 @@ def run_research(
             except Exception:
                 pass
 
-        if "arxiv" in active_sources:
+        if "arxiv" in active_sources and not _over_budget():
             try:
                 papers = search_arxiv(
                     query, categories=rc.arxiv_categories or None,
@@ -1139,7 +1146,7 @@ def run_research(
             except Exception:
                 pass
 
-        if "openreview" in active_sources:
+        if "openreview" in active_sources and not _over_budget():
             try:
                 or_query = _clean_query_for_search(query, config.framework)
                 papers = search_openreview(or_query or query, venues=rc.openreview_venues, max_results=max_per_source, cache=cache)
