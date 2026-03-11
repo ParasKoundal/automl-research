@@ -83,18 +83,18 @@ def detect_model_files(project_root: Path) -> list[str]:
 # Common metric patterns found in ML training output
 METRIC_PATTERNS: list[tuple[str, str, str]] = [
     # (name, regex_pattern, direction)
-    ("val_loss", r"(?:val[_\s]?loss|validation[_\s]?loss)\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("val_accuracy", r"(?:val[_\s]?acc|validation[_\s]?accuracy)\s*[:=]\s*([0-9.]+)", "maximize"),
-    ("test_loss", r"test[_\s]?loss\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("val_bpb", r"val_bpb\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("loss", r"\bloss\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("accuracy", r"\baccuracy\s*[:=]\s*([0-9.]+)", "maximize"),
-    ("f1_score", r"f1[_\s]?score\s*[:=]\s*([0-9.]+)", "maximize"),
-    ("mse", r"\bmse\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("mae", r"\bmae\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("auc", r"\bauc\s*[:=]\s*([0-9.]+)", "maximize"),
-    ("total_loss", r"(?:Average\s+)?(?:Validation\s+)?total[_\s]?loss\s*[:=]\s*([0-9.]+)", "minimize"),
-    ("peak_vram_mb", r"peak_vram_mb\s*[:=]\s*([0-9.]+)", "minimize"),
+    ("val_loss", r"(?:val[_\s]?loss|validation[_\s]?loss)\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("val_accuracy", r"(?:val[_\s]?acc|validation[_\s]?accuracy)\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "maximize"),
+    ("test_loss", r"test[_\s]?loss\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("val_bpb", r"val_bpb\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("loss", r"\bloss\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("accuracy", r"\baccuracy\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "maximize"),
+    ("f1_score", r"f1[_\s]?score\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "maximize"),
+    ("mse", r"\bmse\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("mae", r"\bmae\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("auc", r"\bauc\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "maximize"),
+    ("total_loss", r"(?:Average\s+)?(?:Validation\s+)?total[_\s]?loss\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
+    ("peak_vram_mb", r"peak_vram_mb\s*[:=]\s*([0-9.]+(?:[eE][+-]?\d+)?)", "minimize"),
 ]
 
 

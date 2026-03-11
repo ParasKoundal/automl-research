@@ -82,7 +82,7 @@ def init(template: str | None):
         metric_name = click.prompt("Primary metric name", default="val_loss")
         direction = click.prompt("Direction", type=click.Choice(["minimize", "maximize"]), default="minimize")
         pattern = click.prompt("Grep pattern to extract metric from log",
-                               default=f"{metric_name}\\s*[:=]\\s*([0-9.]+)")
+                               default=f"{metric_name}\\s*[:=]\\s*([0-9.]+(?:[eE][+-]?\\d+)?)")
 
         # Modifiable files
         default_files = scan["config_files"][:3] + scan["model_files"][:2]

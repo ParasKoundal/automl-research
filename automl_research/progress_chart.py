@@ -17,6 +17,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
+def _compute_focused_ylim(
+    values: list[float],
+    lower_pct: float = 2.0,
+    upper_pct: float = 98.0,
+    padding_frac: float = 0.15,
+) -> tuple[float, float]:
+    """Compute y-axis limits focused on the interesting percentile range."""
+    arr = np.array(values)
+    lo = float(np.percentile(arr, lower_pct))
+    hi = float(np.percentile(arr, upper_pct))
+    if hi == lo:
+        margin = abs(lo) * 0.05 if lo != 0 else 0.1
+        return lo - margin, hi + margin
+    span = hi - lo
+    return lo - span * padding_frac, hi + span * padding_frac
+
+
 def generate_progress_chart(
     results_tsv: Path,
     primary_metric: str,
@@ -136,13 +153,16 @@ def generate_progress_chart(
     ax.legend(loc="upper right", fontsize=9)
     ax.grid(True, alpha=0.2)
 
-    # Y-axis: show all data points with margin
+    # Y-axis: percentile-based zoom to interesting region
     all_plotted_vals = disc_vals + kept_vals
-    if all_plotted_vals:
+    if len(all_plotted_vals) >= 5:
+        y_lo, y_hi = _compute_focused_ylim(all_plotted_vals)
+        ax.set_ylim(y_lo, y_hi)
+    elif all_plotted_vals:
         y_min = min(all_plotted_vals)
         y_max = max(all_plotted_vals)
         span = y_max - y_min
-        margin = span * 0.1 if span > 0 else abs(y_min) * 0.01
+        margin = span * 0.1 if span > 0 else abs(y_min) * 0.01 or 0.1
         ax.set_ylim(y_min - margin, y_max + margin)
 
     plt.tight_layout()

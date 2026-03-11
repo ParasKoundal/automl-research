@@ -20,6 +20,9 @@ def generate_program_md(config: ProjectConfig) -> str:
 
     # ── Setup ───────────────────────────────────────────────
     sections.append("## Setup\n")
+    sections.append("**IMPORTANT: Enable auto-approve for terminal commands in your editor settings "
+                    "(e.g., Cursor → Yolo Mode, or add `automl-research` and `git` to allowed commands). "
+                    "The experiment loop must run without manual permission prompts.**\n")
     sections.append("To set up a new experiment session:\n")
     sections.append("1. **Read this file** (`program.md`) for full context.")
     sections.append("2. **Read the modifiable files** to understand the code:")
@@ -54,7 +57,6 @@ def generate_program_md(config: ProjectConfig) -> str:
     # ── Training ────────────────────────────────────────────
     sections.append("## Training\n")
     sections.append(f"Each experiment runs with a **time budget of {config.train.time_budget_quick // 60} minutes** (quick mode).\n")
-    sections.append("### Using CLI helpers (recommended)\n")
     sections.append("```bash")
     sections.append("# Validate changes before training")
     sections.append("automl-research preflight")
@@ -65,12 +67,6 @@ def generate_program_md(config: ProjectConfig) -> str:
     sections.append("# Run training (full mode, for validating promising experiments)")
     sections.append("automl-research train --full")
     sections.append("```\n")
-    sections.append("### Using raw commands (if CLI is not available)\n")
-    sections.append("```bash")
-    sections.append(f"{config.train.command_quick} > .automl-research/runs/NNN_desc/run.log 2>&1")
-    sections.append("```\n")
-    if config.train.command_full:
-        sections.append(f"Full training: `{config.train.command_full}`\n")
 
     # ── Metrics ─────────────────────────────────────────────
     sections.append("## Metrics\n")
@@ -115,17 +111,8 @@ def generate_program_md(config: ProjectConfig) -> str:
     sections.append("   - `-n`: Your reasoning — why you tried this, what you expected, what you learned from the result")
     sections.append("   - If the run crashed: `automl-research decide --crash -d \"what happened\"`")
     sections.append("4. **Go to step 1 immediately.** Do not summarize. Do not ask. Just start the next experiment.\n")
-    sections.append("**IMPORTANT: Run steps 3 as a SINGLE chained command (&&). Do NOT run preflight, commit,")
+    sections.append("**IMPORTANT: Run step 3 as a SINGLE chained command (&&). Do NOT run preflight, commit,")
     sections.append("train, and decide as separate commands. One command = one permission prompt = faster loop.**\n")
-    sections.append("### If CLI is not available\n")
-    sections.append("Use raw commands:")
-    sections.append("```bash")
-    sections.append("# After training:")
-    if primary.extract.method == "log_grep" and primary.extract.pattern:
-        sections.append(f"grep -oP '{primary.extract.pattern}' .automl-research/runs/NNN_desc/run.log")
-    sections.append("# If improved: git commit stays")
-    sections.append("# If worse: git reset --hard HEAD~1")
-    sections.append("```\n")
 
     # ── Simplicity Criterion ────────────────────────────────
     sections.append("## Simplicity Criterion\n")
@@ -141,12 +128,8 @@ def generate_program_md(config: ProjectConfig) -> str:
 
     # ── Logging ─────────────────────────────────────────────
     sections.append("## Logging Results\n")
-    sections.append("The `automl-research decide` command handles all logging automatically. "
-                    "If using raw commands, append to `.automl-research/results.tsv` (tab-separated):\n")
-    sec_names = " ".join(f"\t{s.name}" for s in config.metrics.secondary)
-    sections.append("```")
-    sections.append(f"id\tcommit\t{primary.name}\tstatus\twall_time\tlines_changed\tdescription{sec_names}")
-    sections.append("```\n")
+    sections.append("The `automl-research decide` command handles all logging automatically "
+                    "(results.tsv, summary.md, progress.png, diff.patch, notes.md, git).\n")
 
     # ── Research-Driven Ideas ────────────────────────────────
     if config.research.enabled:
